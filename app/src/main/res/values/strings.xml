@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">kehadiran</string>
+    <!--to toggle the open close button
+       of the navigation drawer-->
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
+    <string-array name="daftar_jurusan">
+        <item>Teknik Informatika</item>
+        <item>Manajemen Informatika</item>
+        <item>Sastra Inggris</item>
+        <item>Fakultas Ilmu Komunikasi</item>
+        <item>Ekonomi Manajemen</item>
+        <item>Ekonomi Akutansi</item>
+    </string-array>
+</resources>
