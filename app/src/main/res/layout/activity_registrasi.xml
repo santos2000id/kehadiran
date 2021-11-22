@@ -100,7 +100,7 @@
                 android:id="@+id/tgllahir"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:hint="Tanggal Lahir"
+                android:hint="Tanggal Lahir (dd-MM-yyyy)"
                 android:textStyle="bold"
                 />
         </com.google.android.material.textfield.TextInputLayout>

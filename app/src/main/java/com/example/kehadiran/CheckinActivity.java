@@ -27,7 +27,9 @@ import android.widget.Toast;
 
 import com.example.kehadiran.datalayer.CheckinRepository;
 import com.example.kehadiran.datalayer.DatabaseHelper;
+import com.example.kehadiran.datalayer.MahasiswaRepository;
 import com.example.kehadiran.model.Kehadiran;
+import com.example.kehadiran.model.Mahasiswa;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -36,7 +38,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class CheckinActivity extends AppCompatActivity {
     private int PERMISSION_ID = 44;
@@ -87,7 +92,7 @@ public class CheckinActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    SaveCheckin(jarak);
+                   boolean res = SaveCheckin(jarak);
                 }catch (Exception ex){
                     Toast.makeText(v.getContext(),ex.getMessage(),Toast.LENGTH_LONG).show();
                 }
@@ -95,6 +100,8 @@ public class CheckinActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
@@ -214,15 +221,27 @@ public class CheckinActivity extends AppCompatActivity {
         return  Math.floor(6366000 * tt) ;
     }
 
+    //Simpan data Checkin
     private boolean SaveCheckin(double jarak){
-        Kehadiran kehadiran = new Kehadiran();
-        kehadiran.setJarak(Double.toString(jarak));
-        kehadiran.setMasuk(new Date());
-        kehadiran.setNim(((GlobalVariable) this.getApplication()).getNim());
-        boolean res = checkinRepository.Insert(kehadiran);
-        if (res){
-            Toast.makeText(this,"Checkin berhasil",Toast.LENGTH_LONG).show();
+        boolean res = false;
+        try {
+            Kehadiran kehadiran = new Kehadiran();
+            kehadiran.setJarak(Double.toString(jarak));
+            kehadiran.setMasuk(new Date());
+            kehadiran.setNim(((GlobalVariable) this.getApplication()).getNim());
+            res = checkinRepository.Insert(kehadiran);
+            if (res){
+                PostDataCheckin(kehadiran);
+                Toast.makeText(this,"Checkin berhasil",Toast.LENGTH_LONG).show();
+            }else
+            {
+                PostDataCheckin(kehadiran);
+                Toast.makeText(this,"Checkin gagal!",Toast.LENGTH_LONG).show();
+            }
+        }catch (Exception ex){
+            Toast.makeText(this,ex.getMessage(),Toast.LENGTH_LONG).show();
         }
+
         web_view.loadUrl("https://ekosantoso.xyz/SIP/Home/DisplayMap?lat=" + location.getLatitude() + "&lon=" + location.getLongitude());
         web_view.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
@@ -246,5 +265,22 @@ public class CheckinActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void PostDataCheckin(Kehadiran kehadiran) {
+        try {
+            // Kirim data Checkin ke server backend
+            HashMap<String,String> params = new HashMap<>();
+            params.put("nim", kehadiran.getNim());
+            params.put("jarak", kehadiran.getJarak());
+            params.put("masuk", new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(kehadiran.getMasuk()));
+
+            new PostTask(this,"https://ekosantoso.xyz/SIP/Home/SaveKehadiran",params).execute();
+        }catch (Exception ex){
+
+            Toast.makeText(this,ex.getMessage()+ex.getStackTrace(),Toast.LENGTH_LONG)
+                    .show();
+
+        }
     }
 }

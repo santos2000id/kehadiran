@@ -65,7 +65,11 @@ public class MainActivity extends AppCompatActivity {
             {
                 ((GlobalVariable) this.getApplication()).setNim(username);
                 result = true ;
+            }else{
+                Toast.makeText(this,"Maaf, password anda salah!",Toast.LENGTH_LONG).show();
             }
+        }else{
+            Toast.makeText(this,"Maaf Anda belum terdaftar, silahkan registrasi dulu!",Toast.LENGTH_LONG).show();
         }
 
         return result;

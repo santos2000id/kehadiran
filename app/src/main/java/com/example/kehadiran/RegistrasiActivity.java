@@ -73,27 +73,21 @@ public class RegistrasiActivity extends AppCompatActivity {
                 try {
 
                     boolean res;
+                    String message = "registrasi berhasil";
                     if (insert)
                         res = mahasiswaRepository.Insert(mahasiswa);
                     else
+                    {
                         res = mahasiswaRepository.Update(mahasiswa);
+                        message = "Update Data berhasil";
+                    }
                     if (res)
                     {
-                        Toast.makeText(v.getContext(),"registrasi berhasil",Toast.LENGTH_SHORT).show();
-                       // Reset Form
-                        nim.setText("");
-                        nama.setText("");
-                        alamat.setText("");
-                        jurusan.setSelected(false);
-                        male.setChecked(false);
-                        female.setChecked(false);
-                        tgllahir.setText("");
-                        password.setText("");
-                        startActivity(new Intent(RegistrasiActivity.this, MainActivity.class));
-                        finish();
-
-
+                        Toast.makeText(v.getContext(),message,Toast.LENGTH_SHORT).show();
+                        ResetForm();
                     }
+                    startActivity(new Intent(RegistrasiActivity.this, MainActivity.class));
+                    finish();
 
 
                 } catch (Exception e) {
@@ -116,7 +110,17 @@ public class RegistrasiActivity extends AppCompatActivity {
 
     }
 
-
+    private void ResetForm() {
+        // Reset Form
+        nim.setText("");
+        nama.setText("");
+        alamat.setText("");
+        jurusan.setSelected(false);
+        male.setChecked(false);
+        female.setChecked(false);
+        tgllahir.setText("");
+        password.setText("");
+    }
 
 
     private void setData(Mahasiswa mahasiswa) {
@@ -142,6 +146,7 @@ public class RegistrasiActivity extends AppCompatActivity {
         nim.setText(mahasiswa.getNim());
         nama.setText(mahasiswa.getNama());
         alamat.setText(mahasiswa.getAlamat());
+        password.setText(mahasiswa.getPassword());
         String[] jurusans = getResources().getStringArray(R.array.daftar_jurusan);
         int pos = 0;
         for(int i=0;i<=jurusans.length-1;i++){

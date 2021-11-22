@@ -5,19 +5,28 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.kehadiran.datalayer.DatabaseHelper;
+import com.example.kehadiran.datalayer.MahasiswaRepository;
+import com.example.kehadiran.model.Mahasiswa;
 import com.google.android.material.navigation.NavigationView;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainMenuActivity extends AppCompatActivity {
 
     public DrawerLayout drawerLayout ;
     public ActionBarDrawerToggle actionBarDrawerToggle;
-
+    private ProgressDialog pDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +78,36 @@ public class MainMenuActivity extends AppCompatActivity {
         TextView txtSelamat = findViewById(R.id.txtselamat);
         String nim = ((GlobalVariable)getApplication()).getNim();
         txtSelamat.setText("Selamat datang " + nim);
+
+
+        PostDataMahasiswa();
+
+    }
+
+    private void PostDataMahasiswa() {
+        try {
+            // Kirim data mahasiswa ke server backend
+            DatabaseHelper dbhelper = new DatabaseHelper(this);
+            MahasiswaRepository mahasiswaRepository = new MahasiswaRepository(dbhelper);
+            ArrayList<Mahasiswa> mahasiswas = mahasiswaRepository.GetAll();
+            HashMap<String,String> params = new HashMap<>();
+            for (Mahasiswa mahasiswa :
+                    mahasiswas) {
+                params.put("nim", mahasiswa.getNim());
+                params.put("nama", mahasiswa.getNama());
+                params.put("alamat", mahasiswa.getAlamat());
+                params.put("tglLahir", new SimpleDateFormat("dd-MM-yyyy").format(mahasiswa.getTglLahir()));
+                params.put("jurusan", mahasiswa.getJurusan());
+                params.put("jenisKelamin", mahasiswa.getJenisKelamin());
+                params.put("password", mahasiswa.getPassword());
+            }
+            new PostTask(this,"https://ekosantoso.xyz/SIP/Home/SaveMahasiswa",params).execute();
+        }catch (Exception ex){
+
+            Toast.makeText(this,ex.getMessage()+ex.getStackTrace(),Toast.LENGTH_LONG)
+.show();
+
+        }
     }
 
     // override the onOptionsItemSelected()
@@ -87,4 +126,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
 
     }
+
+
+
+
 }
