@@ -1,17 +1,16 @@
 package com.example.kehadiran;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.kehadiran.datalayer.DatabaseHelper;
 import com.example.kehadiran.datalayer.MahasiswaRepository;
@@ -24,9 +23,10 @@ import java.util.HashMap;
 
 public class MainMenuActivity extends AppCompatActivity {
 
-    public DrawerLayout drawerLayout ;
+    public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
     private ProgressDialog pDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +47,7 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                int id =  item.getItemId();
+                int id = item.getItemId();
                 switch (id) {
                     case R.id.nav_account:
                         Intent intent = new Intent(getApplicationContext(), RegistrasiActivity.class);
@@ -58,12 +58,12 @@ public class MainMenuActivity extends AppCompatActivity {
                         startActivity(intent2);
                         break;
                     case R.id.nav_settings:
-                        Intent intent3= new Intent(getApplicationContext(), ReportCheckinActivity.class);
+                        Intent intent3 = new Intent(getApplicationContext(), ReportCheckinActivity.class);
                         startActivity(intent3);
                         break;
                     case R.id.nav_logout:
-                        ((GlobalVariable)getApplication()).setNim("");
-                        Intent intent1 = new Intent(getApplicationContext(),MainActivity.class);
+                        ((GlobalVariable) getApplication()).setNim("");
+                        Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent1);
                         MainMenuActivity.this.finish();
                         break;
@@ -76,7 +76,7 @@ public class MainMenuActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView txtSelamat = findViewById(R.id.txtselamat);
-        String nim = ((GlobalVariable)getApplication()).getNim();
+        String nim = ((GlobalVariable) getApplication()).getNim();
         txtSelamat.setText("Selamat datang " + nim);
 
 
@@ -90,7 +90,7 @@ public class MainMenuActivity extends AppCompatActivity {
             DatabaseHelper dbhelper = new DatabaseHelper(this);
             MahasiswaRepository mahasiswaRepository = new MahasiswaRepository(dbhelper);
             ArrayList<Mahasiswa> mahasiswas = mahasiswaRepository.GetAll();
-            HashMap<String,String> params = new HashMap<>();
+            HashMap<String, String> params = new HashMap<>();
             for (Mahasiswa mahasiswa :
                     mahasiswas) {
                 params.put("nim", mahasiswa.getNim());
@@ -101,11 +101,11 @@ public class MainMenuActivity extends AppCompatActivity {
                 params.put("jenisKelamin", mahasiswa.getJenisKelamin());
                 params.put("password", mahasiswa.getPassword());
             }
-            new PostTask(this,"https://ekosantoso.xyz/SIP/Home/SaveMahasiswa",params).execute();
-        }catch (Exception ex){
+            new PostTask(this, "https://ekosantoso.xyz/SIP/Home/SaveMahasiswa", params).execute();
+        } catch (Exception ex) {
 
-            Toast.makeText(this,ex.getMessage()+ex.getStackTrace(),Toast.LENGTH_LONG)
-.show();
+            Toast.makeText(this, ex.getMessage() + ex.getStackTrace(), Toast.LENGTH_LONG)
+                    .show();
 
         }
     }
@@ -122,12 +122,10 @@ public class MainMenuActivity extends AppCompatActivity {
             return true;
         }
 
-                return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
 
 
     }
-
-
 
 
 }

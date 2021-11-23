@@ -10,18 +10,16 @@ import androidx.fragment.app.DialogFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
+    public String Tanggal;
+    private EditText editText;
+
     public void setEditText(EditText editText) {
         this.editText = editText;
     }
-
-    private EditText editText ;
-
-    public String Tanggal ;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -38,7 +36,7 @@ public class DatePickerFragment extends DialogFragment
     public void onDateSet(DatePicker view, int year, int month, int day) {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Calendar c = Calendar.getInstance();
-        c.set(year,month,day);
+        c.set(year, month, day);
         Tanggal = format.format(c.getTime());
         editText.setText(Tanggal);
     }

@@ -1,7 +1,5 @@
 package com.example.kehadiran;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +9,8 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.kehadiran.datalayer.DatabaseHelper;
 import com.example.kehadiran.datalayer.MahasiswaRepository;
 import com.example.kehadiran.model.Mahasiswa;
@@ -19,15 +19,16 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class RegistrasiActivity extends AppCompatActivity {
-    EditText nim ;
-    EditText nama ;
+    EditText nim;
+    EditText nama;
     EditText alamat;
     EditText tgllahir;
     EditText password;
     Spinner jurusan;
-    RadioButton male ;
+    RadioButton male;
     RadioButton female;
-    private MahasiswaRepository mahasiswaRepository ;
+    private MahasiswaRepository mahasiswaRepository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,14 +47,14 @@ public class RegistrasiActivity extends AppCompatActivity {
         Button btnSimpan = findViewById(R.id.tombol1);
         DatabaseHelper dbhelper = new DatabaseHelper(this);
         mahasiswaRepository = new MahasiswaRepository(dbhelper);
-        Toast.makeText(getApplication(),dbhelper.getDatabaseName(), Toast.LENGTH_SHORT)
+        Toast.makeText(getApplication(), dbhelper.getDatabaseName(), Toast.LENGTH_SHORT)
                 .show();
 
         tgllahir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatePickerFragment fragment = new DatePickerFragment();
-                fragment.show(getSupportFragmentManager(),"datePicker");
+                fragment.show(getSupportFragmentManager(), "datePicker");
                 fragment.setEditText(tgllahir);
             }
         });
@@ -63,8 +64,7 @@ public class RegistrasiActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Mahasiswa mahasiswa = mahasiswaRepository.GetOne(nim.getText().toString().trim());
                 boolean insert = false;
-                if (mahasiswa == null)
-                {
+                if (mahasiswa == null) {
                     mahasiswa = new Mahasiswa();
                     insert = true;
                 }
@@ -76,14 +76,12 @@ public class RegistrasiActivity extends AppCompatActivity {
                     String message = "registrasi berhasil";
                     if (insert)
                         res = mahasiswaRepository.Insert(mahasiswa);
-                    else
-                    {
+                    else {
                         res = mahasiswaRepository.Update(mahasiswa);
                         message = "Update Data berhasil";
                     }
-                    if (res)
-                    {
-                        Toast.makeText(v.getContext(),message,Toast.LENGTH_SHORT).show();
+                    if (res) {
+                        Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
                         ResetForm();
                     }
                     startActivity(new Intent(RegistrasiActivity.this, MainActivity.class));
@@ -92,7 +90,7 @@ public class RegistrasiActivity extends AppCompatActivity {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(v.getContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -100,7 +98,7 @@ public class RegistrasiActivity extends AppCompatActivity {
 
         //Load Data dari Menu Profile
         String nim = ((GlobalVariable) this.getApplication()).getNim();
-        if (nim != null && ! nim.isEmpty()){
+        if (nim != null && !nim.isEmpty()) {
             getSupportActionBar().setTitle("User Profile");
             btnSimpan.setText("Update");
             Mahasiswa mahasiswa = mahasiswaRepository.GetOne(nim);
@@ -142,24 +140,23 @@ public class RegistrasiActivity extends AppCompatActivity {
     }
 
     //Load Form from Object Mahasiswa
-    private void LoadMahasiswaToForm(Mahasiswa mahasiswa){
+    private void LoadMahasiswaToForm(Mahasiswa mahasiswa) {
         nim.setText(mahasiswa.getNim());
         nama.setText(mahasiswa.getNama());
         alamat.setText(mahasiswa.getAlamat());
         password.setText(mahasiswa.getPassword());
         String[] jurusans = getResources().getStringArray(R.array.daftar_jurusan);
         int pos = 0;
-        for(int i=0;i<=jurusans.length-1;i++){
-            if (jurusans[i].equals(mahasiswa.getJurusan()))
-            {
-                pos = i ;
+        for (int i = 0; i <= jurusans.length - 1; i++) {
+            if (jurusans[i].equals(mahasiswa.getJurusan())) {
+                pos = i;
                 break;
             }
         }
         jurusan.setSelection(pos);
         if (mahasiswa.getJenisKelamin().equals("Pria"))
             male.setChecked(true);
-        else  if (mahasiswa.getJenisKelamin().equals("Wanita"))
+        else if (mahasiswa.getJenisKelamin().equals("Wanita"))
             female.setChecked(true);
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         tgllahir.setText(format.format(mahasiswa.getTglLahir()));

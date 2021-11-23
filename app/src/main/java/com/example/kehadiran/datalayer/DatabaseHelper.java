@@ -3,9 +3,6 @@ package com.example.kehadiran.datalayer;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
-
-import androidx.annotation.Nullable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -14,7 +11,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public DatabaseHelper(Context context) {
-        super(context,NamaDatabase,null,VersiDatabase);
+        super(context, NamaDatabase, null, VersiDatabase);
     }
 
     @Override

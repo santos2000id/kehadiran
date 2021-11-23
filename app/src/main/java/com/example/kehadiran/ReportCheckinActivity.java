@@ -1,23 +1,19 @@
 package com.example.kehadiran;
 
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.widget.Toast;
-
 import com.example.kehadiran.adapter.CheckinAdapter;
-import com.example.kehadiran.datalayer.CheckinRepository;
-import com.example.kehadiran.datalayer.DatabaseHelper;
 import com.example.kehadiran.model.Kehadiran;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ReportCheckinActivity extends AppCompatActivity {
 
@@ -34,6 +30,7 @@ public class ReportCheckinActivity extends AppCompatActivity {
 
         listKehadiran = findViewById(R.id.rcKehadiran);
         /*
+        Menampilkan data checkin dari local db
         DatabaseHelper dbhelper = new DatabaseHelper(this);
         CheckinRepository checkinRepository = new CheckinRepository(dbhelper);
         try {
@@ -45,7 +42,6 @@ public class ReportCheckinActivity extends AppCompatActivity {
             Toast.makeText(this,ex.getMessage() + ex.getStackTrace(),Toast.LENGTH_LONG).show();
         }
         */
-
 
 
         GetDataCheckinAllMahasiswa();
@@ -60,24 +56,25 @@ public class ReportCheckinActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     private void GetDataCheckinAllMahasiswa() {
         try {
-            // Kirim data Checkin ke server backend
-           GetTask task =  new GetTask(this, "https://ekosantoso.xyz/SIP/Home/GetAllKehadiran",
-                   new AsyncResponse() {
-                       @Override
-                       public void processFinish(ArrayList<Kehadiran> output) {
-                           CheckinAdapter checkinAdapter = new CheckinAdapter(output);
-                           listKehadiran.setAdapter(checkinAdapter);
-                           listKehadiran.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                       }
-                   });
-           task.execute();
+            // Mendapatkan data checkin dari server backend via API
+            GetTask task = new GetTask(this, "https://ekosantoso.xyz/SIP/Home/GetAllKehadiran",
+                    new AsyncResponse() {
+                        @Override
+                        public void processFinish(ArrayList<Kehadiran> output) {
+                            CheckinAdapter checkinAdapter = new CheckinAdapter(output);
+                            listKehadiran.setAdapter(checkinAdapter);
+                            listKehadiran.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        }
+                    });
+            task.execute();
 
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
 
-            Toast.makeText(this,ex.getMessage()+ex.getStackTrace(),Toast.LENGTH_LONG)
+            Toast.makeText(this, ex.getMessage() + ex.getStackTrace(), Toast.LENGTH_LONG)
                     .show();
 
         }

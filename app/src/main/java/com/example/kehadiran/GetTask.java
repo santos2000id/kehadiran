@@ -14,21 +14,17 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 
-public class GetTask extends AsyncTask<Void, Void, Void>
-
-{
+public class GetTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "";
-    private Context mContext ;
-    private ProgressDialog pDialog;
-    private String mUrl ;
-    private ArrayList<Kehadiran> data;
+    private final Context mContext;
+    private final String mUrl;
     public AsyncResponse delegate = null;
+    private ProgressDialog pDialog;
+    private ArrayList<Kehadiran> data;
 
-    public GetTask(Context context,String url,AsyncResponse delegate){
+    public GetTask(Context context, String url, AsyncResponse delegate) {
         mContext = context;
         mUrl = url;
         this.delegate = delegate;
@@ -44,42 +40,41 @@ public class GetTask extends AsyncTask<Void, Void, Void>
 
     }
 
-            @Override
-            protected Void doInBackground(Void... voids) {
-                String text =null;
+    @Override
+    protected Void doInBackground(Void... voids) {
+        String text = null;
+        try {
+            HttpHandler sh = new HttpHandler();
+            // Making a request to url and getting response
+            String url = mUrl;
+            String jsonStr = sh.getServiceCall(url);
+
+            Log.e(TAG, "Response from url: " + jsonStr);
+
+            if (jsonStr != null) {
                 try {
-                    HttpHandler sh = new HttpHandler();
-                    // Making a request to url and getting response
-                    String url = mUrl;
-                    String jsonStr = sh.getServiceCall(url);
 
-                    Log.e(TAG, "Response from url: " + jsonStr);
+                    // Getting JSON Array node
+                    JSONArray results = new JSONArray(jsonStr);
+                    data = new ArrayList<Kehadiran>();
+                    if (results != null) {
+                        for (int i = 0; i < results.length(); i++) {
 
-                    if (jsonStr != null) {
-                        try {
-
-                            // Getting JSON Array node
-                            JSONArray results = new JSONArray(jsonStr);
-                            data = new ArrayList<Kehadiran>();
-                            if (results != null) {
-                                for (int i=0;i<results.length();i++)
-                                {
-
-                                        JSONObject hadir = results.getJSONObject(i);
-                                        String tanggal = hadir.getString("tglKehadiran");
-                                        String nim = hadir.getString("nim");
-                                        Double jarak = hadir.getDouble("jarak");
-                                    Kehadiran kehadiran = new Kehadiran();
-                                    kehadiran.setNim(nim);
-                                    kehadiran.setMasuk(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(tanggal.replace("T"," ")));
-                                    kehadiran.setJarak(jarak.toString());
-                                    data.add(kehadiran);
-                                }
-                            }
+                            JSONObject hadir = results.getJSONObject(i);
+                            String tanggal = hadir.getString("tglKehadiran");
+                            String nim = hadir.getString("nim");
+                            Double jarak = hadir.getDouble("jarak");
+                            Kehadiran kehadiran = new Kehadiran();
+                            kehadiran.setNim(nim);
+                            kehadiran.setMasuk(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(tanggal.replace("T", " ")));
+                            kehadiran.setJarak(jarak.toString());
+                            data.add(kehadiran);
+                        }
+                    }
 
 
-                        } catch (final JSONException e) {
-                            Log.e(TAG, "Json parsing error: " + e.getMessage());
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
                             /*
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -91,9 +86,9 @@ public class GetTask extends AsyncTask<Void, Void, Void>
                                 }
                             });
                             */
-                        }
-                    } else {
-                        Log.e(TAG, "Couldn't get json from server.");
+                }
+            } else {
+                Log.e(TAG, "Couldn't get json from server.");
                         /*
                         runOnUiThread(new Runnable() {
                             @Override
@@ -105,22 +100,20 @@ public class GetTask extends AsyncTask<Void, Void, Void>
                             }
                         });
                         */
-                    }
-
-                    return null;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                return  null;
             }
 
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            delegate.processFinish(data);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void result) {
+        super.onPostExecute(result);
+        delegate.processFinish(data);
+        if (pDialog.isShowing())
+            pDialog.dismiss();
+    }
 }

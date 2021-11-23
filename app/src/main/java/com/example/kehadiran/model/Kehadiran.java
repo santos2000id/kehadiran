@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class Kehadiran {
 
-    private String nim ;
-    private Date masuk ;
+    private String nim;
+    private Date masuk;
     private String jarak;
 
     public String getNim() {

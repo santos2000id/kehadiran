@@ -6,28 +6,24 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 
-public class PostTask extends AsyncTask<Void, Void, Void>
-
-{
+public class PostTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "";
-    private Context mContext ;
-    private ProgressDialog pDialog;
-    private String mUrl ;
-    ArrayList<HashMap<String, String>> resultList;
+    private final Context mContext;
+    private final String mUrl;
+    private final HashMap<String, String> params;
     public ArrayList<ArrayList<String>> nodes;
-    private HashMap<String, String> params;
+    ArrayList<HashMap<String, String>> resultList;
+    private ProgressDialog pDialog;
 
 
-    public PostTask(Context context,String url,HashMap<String,String> bodyParams){
+    public PostTask(Context context, String url, HashMap<String, String> bodyParams) {
         mContext = context;
         mUrl = url;
         params = bodyParams;
@@ -45,12 +41,12 @@ public class PostTask extends AsyncTask<Void, Void, Void>
 
     @Override
     protected Void doInBackground(Void... voids) {
-        String text =null;
+        String text = null;
         try {
             HttpHandler sh = new HttpHandler();
             // Making a request to url and getting response
             String url = mUrl;
-            String jsonStr = sh.postServiceCall(url,params);
+            String jsonStr = sh.postServiceCall(url, params);
 
             Log.e(TAG, "Response from url: " + jsonStr);
 
@@ -89,12 +85,10 @@ public class PostTask extends AsyncTask<Void, Void, Void>
             }
 
             return null;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return  null;
+        return null;
     }
 
     @Override

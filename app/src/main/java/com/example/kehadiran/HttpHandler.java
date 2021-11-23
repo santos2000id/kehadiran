@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ public class HttpHandler {
 
     public HttpHandler() {
     }
+
     public String getServiceCall(String reqUrl) {
         String response = null;
         try {
@@ -42,7 +44,7 @@ public class HttpHandler {
             Log.e(TAG, "ProtocolException: " + e.getMessage());
         } catch (IOException e) {
 
-              Log.e(TAG, "IOException: " + e.getMessage());
+            Log.e(TAG, "IOException: " + e.getMessage());
         } catch (Exception e) {
             Log.e(TAG, "Exception: " + e.getMessage());
         }
@@ -60,21 +62,20 @@ public class HttpHandler {
             conn.setDoOutput(true);
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(os, "UTF-8"));
+                    new OutputStreamWriter(os, StandardCharsets.UTF_8));
             writer.write(getPostDataString(postDataParams));
 
             writer.flush();
             writer.close();
             os.close();
-            int responseCode=conn.getResponseCode();
+            int responseCode = conn.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 // read the response
                 InputStream in = new BufferedInputStream(conn.getInputStream());
                 response = convertStreamToString(in);
-            }
-            else {
-                response="";
+            } else {
+                response = "";
 
             }
         } catch (MalformedURLException e) {
@@ -93,7 +94,7 @@ public class HttpHandler {
     private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
         boolean first = true;
-        for(Map.Entry<String, String> entry : params.entrySet()){
+        for (Map.Entry<String, String> entry : params.entrySet()) {
             if (first)
                 first = false;
             else

@@ -1,14 +1,7 @@
 package com.example.kehadiran;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuPopupHelper;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -25,11 +18,14 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.example.kehadiran.datalayer.CheckinRepository;
 import com.example.kehadiran.datalayer.DatabaseHelper;
-import com.example.kehadiran.datalayer.MahasiswaRepository;
 import com.example.kehadiran.model.Kehadiran;
-import com.example.kehadiran.model.Mahasiswa;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -39,20 +35,30 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 public class CheckinActivity extends AppCompatActivity {
-    private int PERMISSION_ID = 44;
-    private FusedLocationProviderClient fusedLocationClient;
-    private final double  Latitude = -6.1696902 ;
-    private  final double longitude = 106.8020888;
-    private CheckinRepository checkinRepository ;
-    private double jarak;
+    private final int PERMISSION_ID = 44;
+    private final double Latitude = -6.1696902;
+    private final double longitude = 106.8020888;
     WebView web_view;
+    private FusedLocationProviderClient fusedLocationClient;
+    private CheckinRepository checkinRepository;
+    private double jarak;
     private Location location;
-    private  ProgressDialog progressDialog;
+    private final LocationCallback mLocationCallback = new LocationCallback() {
+
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            location = locationResult.getLastLocation();
+            double jarak = meterDistanceBetweenPoints((float) location.getLatitude(), (float) location.getLongitude(), (float) Latitude, (float) longitude);
+            Toast.makeText(getApplicationContext(), "Jarak Lokasi Anda dengan kampus : " + jarak + " meter", Toast.LENGTH_LONG).show();
+
+        }
+    };
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,16 +98,14 @@ public class CheckinActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                   boolean res = SaveCheckin(jarak);
-                }catch (Exception ex){
-                    Toast.makeText(v.getContext(),ex.getMessage(),Toast.LENGTH_LONG).show();
+                    boolean res = SaveCheckin(jarak);
+                } catch (Exception ex) {
+                    Toast.makeText(v.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
             }
         });
     }
-
-
 
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
@@ -122,8 +126,8 @@ public class CheckinActivity extends AppCompatActivity {
                         if (location == null) {
                             requestNewLocationData();
                         } else {
-                            jarak = meterDistanceBetweenPoints((float)location.getLatitude(),(float)location.getLongitude(),(float)Latitude,(float)longitude);
-                            Toast.makeText(getApplicationContext(),"Jarak Lokasi Anda dengan kampus : " + jarak + " meter",Toast.LENGTH_LONG ).show();
+                            jarak = meterDistanceBetweenPoints((float) location.getLatitude(), (float) location.getLongitude(), (float) Latitude, (float) longitude);
+                            Toast.makeText(getApplicationContext(), "Jarak Lokasi Anda dengan kampus : " + jarak + " meter", Toast.LENGTH_LONG).show();
 
                         }
                     }
@@ -156,17 +160,6 @@ public class CheckinActivity extends AppCompatActivity {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
     }
-
-    private LocationCallback mLocationCallback = new LocationCallback() {
-
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            location = locationResult.getLastLocation();
-            double jarak = meterDistanceBetweenPoints((float)location.getLatitude(),(float)location.getLongitude(),(float)Latitude,(float)longitude);
-            Toast.makeText(getApplicationContext(),"Jarak Lokasi Anda dengan kampus : " + jarak  + " meter",Toast.LENGTH_LONG ).show();
-
-        }
-    };
 
     // method to check for permissions
     private boolean checkPermissions() {
@@ -206,7 +199,7 @@ public class CheckinActivity extends AppCompatActivity {
     }
 
     private double meterDistanceBetweenPoints(float lat_a, float lng_a, float lat_b, float lng_b) {
-        float pk = (float) (180.f/Math.PI);
+        float pk = (float) (180.f / Math.PI);
 
         float a1 = lat_a / pk;
         float a2 = lng_a / pk;
@@ -218,11 +211,11 @@ public class CheckinActivity extends AppCompatActivity {
         double t3 = Math.sin(a1) * Math.sin(b1);
         double tt = Math.acos(t1 + t2 + t3);
 
-        return  Math.floor(6366000 * tt) ;
+        return Math.floor(6366000 * tt);
     }
 
     //Simpan data Checkin
-    private boolean SaveCheckin(double jarak){
+    private boolean SaveCheckin(double jarak) {
         boolean res = false;
         try {
             Kehadiran kehadiran = new Kehadiran();
@@ -230,19 +223,18 @@ public class CheckinActivity extends AppCompatActivity {
             kehadiran.setMasuk(new Date());
             kehadiran.setNim(((GlobalVariable) this.getApplication()).getNim());
             res = checkinRepository.Insert(kehadiran);
-            if (res){
+            if (res) {
                 PostDataCheckin(kehadiran);
-                Toast.makeText(this,"Checkin berhasil",Toast.LENGTH_LONG).show();
-            }else
-            {
+                Toast.makeText(this, "Checkin berhasil", Toast.LENGTH_LONG).show();
+            } else {
                 PostDataCheckin(kehadiran);
-                Toast.makeText(this,"Checkin gagal!",Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Checkin gagal!", Toast.LENGTH_LONG).show();
             }
-        }catch (Exception ex){
-            Toast.makeText(this,ex.getMessage(),Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+            Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-        web_view.loadUrl("https://ekosantoso.xyz/SIP/Home/DisplayMap?lat=" + location.getLatitude() + "&lon=" + location.getLongitude());
+        web_view.loadUrl("https://ekosantoso.xyz/SIP/Home/DisplayMap?lat=" + location.getLatitude() + "&lon=" + location.getLongitude() + "&nim=" + ((GlobalVariable) this.getApplication()).getNim());
         web_view.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
                 if (progress < 100) {
@@ -254,7 +246,7 @@ public class CheckinActivity extends AppCompatActivity {
             }
         });
 
-        return res ;
+        return res;
     }
 
     @Override
@@ -270,15 +262,15 @@ public class CheckinActivity extends AppCompatActivity {
     private void PostDataCheckin(Kehadiran kehadiran) {
         try {
             // Kirim data Checkin ke server backend
-            HashMap<String,String> params = new HashMap<>();
+            HashMap<String, String> params = new HashMap<>();
             params.put("nim", kehadiran.getNim());
             params.put("jarak", kehadiran.getJarak());
             params.put("masuk", new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(kehadiran.getMasuk()));
 
-            new PostTask(this,"https://ekosantoso.xyz/SIP/Home/SaveKehadiran",params).execute();
-        }catch (Exception ex){
+            new PostTask(this, "https://ekosantoso.xyz/SIP/Home/SaveKehadiran", params).execute();
+        } catch (Exception ex) {
 
-            Toast.makeText(this,ex.getMessage()+ex.getStackTrace(),Toast.LENGTH_LONG)
+            Toast.makeText(this, ex.getMessage() + ex.getStackTrace(), Toast.LENGTH_LONG)
                     .show();
 
         }

@@ -1,10 +1,8 @@
 package com.example.kehadiran.datalayer;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
 import com.example.kehadiran.model.Mahasiswa;
@@ -13,42 +11,28 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class MahasiswaRepository  {
-
-    private DatabaseHelper dbHelper ;
-
-    static abstract class MyColumns implements BaseColumns{
-        static final String NamaTabel = "Mahasiswa";
-        static final String NIM ="NIM";
-        static final String Nama = "Nama_Mahasiswa";
-        static final String Jurusan = "Jurusan";
-        static final String JenisKelamin = "Jenis_Kelamin";
-        static final String TanggalLahir = "Tanggal_Lahir";
-        static final String Alamat = "Alamat";
-        static final String Password = "Password";
-    }
-
-    public MahasiswaRepository(DatabaseHelper helper){
-        dbHelper = helper;
-    }
+public class MahasiswaRepository {
 
     //Query yang digunakan untuk membuat Tabel
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + MyColumns.NamaTabel +
-        "("+  MyColumns.NIM + " TEXT PRIMARY KEY, " +  MyColumns.Nama + " TEXT NOT NULL, " + MyColumns.Jurusan +
+            "(" + MyColumns.NIM + " TEXT PRIMARY KEY, " + MyColumns.Nama + " TEXT NOT NULL, " + MyColumns.Jurusan +
             " TEXT NOT NULL, " + MyColumns.JenisKelamin + " TEXT NOT NULL," + MyColumns.TanggalLahir +
-            " TEXT NOT NULL, " + MyColumns.Alamat + " TEXT NOT NULL, " + MyColumns.Password +  " TEXT NOT NULL)";
-
+            " TEXT NOT NULL, " + MyColumns.Alamat + " TEXT NOT NULL, " + MyColumns.Password + " TEXT NOT NULL)";
     //Query yang digunakan untuk mengupgrade Tabel
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + MyColumns.NamaTabel;
+    private final DatabaseHelper dbHelper;
 
+    public MahasiswaRepository(DatabaseHelper helper) {
+        dbHelper = helper;
+    }
 
-    public boolean Insert(Mahasiswa mahasiswa){
+    public boolean Insert(Mahasiswa mahasiswa) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         MapMahasiswaToCV(mahasiswa, cv);
-        long res = 0 ;
-        res = db.insert(MyColumns.NamaTabel,null,cv);
-        return res > 0 ;
+        long res = 0;
+        res = db.insert(MyColumns.NamaTabel, null, cv);
+        return res > 0;
     }
 
     private void MapMahasiswaToCV(Mahasiswa mahasiswa, ContentValues cv) {
@@ -61,40 +45,38 @@ public class MahasiswaRepository  {
         cv.put(MyColumns.TanggalLahir, new SimpleDateFormat("dd-MM-yyyy").format(mahasiswa.getTglLahir()));
     }
 
-    public boolean Update(Mahasiswa mahasiswa){
+    public boolean Update(Mahasiswa mahasiswa) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         MapMahasiswaToCV(mahasiswa, cv);
-        int res = 0 ;
-        res = db.update(MyColumns.NamaTabel,cv,"NIM=?",new String[]{mahasiswa.getNim()});
-        return res > 0 ;
+        int res = 0;
+        res = db.update(MyColumns.NamaTabel, cv, "NIM=?", new String[]{mahasiswa.getNim()});
+        return res > 0;
     }
 
-    public boolean Delete(Mahasiswa mahasiswa){
+    public boolean Delete(Mahasiswa mahasiswa) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int res = db.delete(MyColumns.NamaTabel,MyColumns.NIM + " LIKE ?", new String[] {mahasiswa.getNim()});
-        return res > 0 ;
+        int res = db.delete(MyColumns.NamaTabel, MyColumns.NIM + " LIKE ?", new String[]{mahasiswa.getNim()});
+        return res > 0;
     }
 
-    public ArrayList<Mahasiswa> GetAll(){
+    public ArrayList<Mahasiswa> GetAll() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = null ;
+        Cursor cursor = null;
         ArrayList<Mahasiswa> results = new ArrayList<Mahasiswa>();
 
-        try
-        {
+        try {
             cursor = db.rawQuery("Select * from Mahasiswa", null);
-            while (cursor.moveToNext()){
+            while (cursor.moveToNext()) {
                 Mahasiswa mahasiswa = new Mahasiswa();
                 MapCursorToMahasiswa(cursor, mahasiswa);
                 results.add(mahasiswa);
             }
 
 
+        } catch (Exception ex) {
 
-        }catch (Exception ex){
-
-        }finally {
+        } finally {
             cursor.close();
             return results;
         }
@@ -112,27 +94,36 @@ public class MahasiswaRepository  {
         mahasiswa.setTglLahir(format.parse(cursor.getString(cursor.getColumnIndexOrThrow(MyColumns.TanggalLahir))));
     }
 
-    public Mahasiswa GetOne(String nim){
+    public Mahasiswa GetOne(String nim) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = null ;
+        Cursor cursor = null;
         Mahasiswa mahasiswa = null;
 
-        try
-        {
-            cursor = db.rawQuery("Select * from Mahasiswa Where NIM='"+nim+"'", null);
-            while (cursor.moveToNext()){
+        try {
+            cursor = db.rawQuery("Select * from Mahasiswa Where NIM='" + nim + "'", null);
+            while (cursor.moveToNext()) {
                 mahasiswa = new Mahasiswa();
-                MapCursorToMahasiswa(cursor,mahasiswa);
+                MapCursorToMahasiswa(cursor, mahasiswa);
             }
 
 
+        } catch (Exception ex) {
 
-        }catch (Exception ex){
-
-        }finally {
+        } finally {
             cursor.close();
             return mahasiswa;
         }
 
+    }
+
+    static abstract class MyColumns implements BaseColumns {
+        static final String NamaTabel = "Mahasiswa";
+        static final String NIM = "NIM";
+        static final String Nama = "Nama_Mahasiswa";
+        static final String Jurusan = "Jurusan";
+        static final String JenisKelamin = "Jenis_Kelamin";
+        static final String TanggalLahir = "Tanggal_Lahir";
+        static final String Alamat = "Alamat";
+        static final String Password = "Password";
     }
 }
